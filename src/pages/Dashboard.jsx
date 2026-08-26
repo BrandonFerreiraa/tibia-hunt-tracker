@@ -1,31 +1,59 @@
-import { useState } from 'react'
-import HuntForm from '../components/HuntForm'
-import HuntList from '../components/HuntList'
+import CharacterForm from '../components/CharacterForm'
+import CharacterList from '../components/CharacterList'
+import SessionForm from '../components/SessionForm'
+import SessionList from '../components/SessionList'
+import { useCharacters } from '../hooks/useCharacters'
+import { useSessions } from '../hooks/useSessions'
 
 function Dashboard() {
-  const [hunts, setHunts] = useState(() => {
-    const storedHunts = localStorage.getItem('hunts')
+  const {
+    characters,
+    loading: loadingCharacters,
+    activeCharacterId,
+    selectCharacter,
+    addCharacter,
+    removeCharacter,
+  } = useCharacters()
 
-    if (!storedHunts) return []
+  const { sessions, loading: loadingSessions, addSession } = useSessions(activeCharacterId)
 
-    try {
-      const parsedHunts = JSON.parse(storedHunts)
-      return Array.isArray(parsedHunts) ? parsedHunts : []
-    } catch {
-      return []
+  function handleRemoveCharacter(id) {
+    const character = characters.find((c) => c.id === id)
+    if (!character) return
+    if (!window.confirm(`Remover "${character.name}"? Isso também remove todas as sessões dele.`)) {
+      return
     }
-  })
-
-  function addHunt(newHunt) {
-    const updatedHunts = [...hunts, newHunt]
-    setHunts(updatedHunts)
-    localStorage.setItem('hunts', JSON.stringify(updatedHunts))
+    removeCharacter(id)
   }
 
   return (
     <div>
-      <HuntForm onAddHunt={addHunt} />
-      <HuntList hunts={hunts} />
+      <section>
+        <h2>Personagens</h2>
+        <CharacterForm onAddCharacter={addCharacter} />
+        {loadingCharacters ? (
+          <p>Carregando personagens...</p>
+        ) : (
+          <CharacterList
+            characters={characters}
+            activeCharacterId={activeCharacterId}
+            onSelect={selectCharacter}
+            onRemove={handleRemoveCharacter}
+          />
+        )}
+      </section>
+
+      <section>
+        <h2>Sessões</h2>
+        {!activeCharacterId ? (
+          <p>Cadastre e selecione um personagem acima para registrar sessões.</p>
+        ) : (
+          <>
+            <SessionForm activeCharacterId={activeCharacterId} onSave={addSession} />
+            {loadingSessions ? <p>Carregando sessões...</p> : <SessionList sessions={sessions} />}
+          </>
+        )}
+      </section>
     </div>
   )
 }
