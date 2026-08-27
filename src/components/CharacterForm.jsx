@@ -1,10 +1,11 @@
 import { useState } from 'react'
 import Button from './ui/Button'
-import { Input } from './ui/Input'
+import { Input, Select } from './ui/Input'
 
 function CharacterForm({ onAddCharacter }) {
   const [name, setName] = useState('')
   const [world, setWorld] = useState('')
+  const [type, setType] = useState('principal')
   const [error, setError] = useState(null)
   const [submitting, setSubmitting] = useState(false)
 
@@ -15,7 +16,7 @@ function CharacterForm({ onAddCharacter }) {
     setSubmitting(true)
     setError(null)
 
-    const { error: insertError } = await onAddCharacter({ name, world })
+    const { error: insertError } = await onAddCharacter({ name, world, type })
 
     setSubmitting(false)
 
@@ -26,6 +27,7 @@ function CharacterForm({ onAddCharacter }) {
 
     setName('')
     setWorld('')
+    setType('principal')
   }
 
   return (
@@ -48,6 +50,11 @@ function CharacterForm({ onAddCharacter }) {
           onChange={(e) => setWorld(e.target.value)}
           className="sm:w-40"
         />
+
+        <Select value={type} onChange={(e) => setType(e.target.value)} className="sm:w-36">
+          <option value="principal">Principal</option>
+          <option value="maker">Maker</option>
+        </Select>
 
         <Button type="submit" disabled={submitting}>
           Adicionar

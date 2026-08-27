@@ -64,7 +64,7 @@ function CharacterVerification({ character, onVerified }) {
   )
 }
 
-function CharacterList({ characters, activeCharacterId, onSelect, onRemove, onRefresh }) {
+function CharacterList({ characters, activeCharacterId, onSelect, onRemove, onRefresh, onToggleType }) {
   if (characters.length === 0) {
     return (
       <Card className="text-sm text-text-muted">
@@ -84,16 +84,28 @@ function CharacterList({ characters, activeCharacterId, onSelect, onRemove, onRe
             className={isActive ? 'border-accent/50 ring-1 ring-accent/20' : ''}
           >
             <div className="flex items-center justify-between gap-3">
-              <button
-                type="button"
-                onClick={() => onSelect(character.id)}
-                className={`cursor-pointer text-left text-sm font-semibold transition-colors ${
-                  isActive ? 'text-accent' : 'text-text hover:text-accent'
-                }`}
-              >
-                {character.name} <span className="font-normal text-text-muted">({character.world})</span>
-                {isActive && ' ✓'}
-              </button>
+              <div className="flex items-center gap-2">
+                <button
+                  type="button"
+                  onClick={() => onSelect(character.id)}
+                  className={`cursor-pointer text-left text-sm font-semibold transition-colors ${
+                    isActive ? 'text-accent' : 'text-text hover:text-accent'
+                  }`}
+                >
+                  {character.name} <span className="font-normal text-text-muted">({character.world})</span>
+                  {isActive && ' ✓'}
+                </button>
+                <button
+                  type="button"
+                  onClick={() => onToggleType(character.id, character.type === 'maker' ? 'principal' : 'maker')}
+                  className="cursor-pointer"
+                  title={character.type === 'maker' ? 'Clique para tornar Principal' : 'Clique para tornar Maker'}
+                >
+                  <Badge variant={character.type === 'maker' ? 'gold' : 'neutral'}>
+                    {character.type === 'maker' ? 'Maker' : 'Principal'}
+                  </Badge>
+                </button>
+              </div>
               <Button variant="danger" size="sm" onClick={() => onRemove(character.id)}>
                 Remover
               </Button>

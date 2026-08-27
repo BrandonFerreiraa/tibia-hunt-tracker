@@ -1,5 +1,7 @@
 import { useHuntsFeed } from '../hooks/useHuntsFeed'
 import { useHuntsFilters } from '../hooks/useHuntsFilters'
+import { useCharacters } from '../hooks/useCharacters'
+import { formatDuration } from '../lib/formatDuration'
 import Card from '../components/ui/Card'
 import Button from '../components/ui/Button'
 import Badge from '../components/ui/Badge'
@@ -15,6 +17,8 @@ function formatNumber(n) {
 
 function HuntsFeed() {
   const { hunts, loading } = useHuntsFeed()
+  const { characters } = useCharacters()
+  const ownCharacterIds = new Set(characters.map((c) => c.id))
   const {
     filters,
     updateFilter,
@@ -110,6 +114,11 @@ function HuntsFeed() {
 
               <p className="mt-1 text-sm text-text-muted">
                 {hunt.character_name} ({hunt.world})
+                {ownCharacterIds.has(hunt.character_id) && (
+                  <Badge variant="gold" className="ml-2">
+                    Sua hunt
+                  </Badge>
+                )}
                 {hunt.verified && (
                   <Badge variant="success" className="ml-2">
                     ✔ Level {hunt.stats_level} {hunt.stats_vocation}
@@ -118,7 +127,7 @@ function HuntsFeed() {
               </p>
 
               <p className="mt-2 text-sm text-text-muted">
-                Duração: {Math.round(hunt.duration_seconds / 60)} min · XP/h:{' '}
+                Duração: {formatDuration(hunt.duration_seconds)} · XP/h:{' '}
                 {formatNumber(hunt.xp_per_hour)} · Profit/h:{' '}
                 <span className="font-medium text-gold">{formatNumber(hunt.profit_per_hour)}</span> · Total:{' '}
                 {formatNumber(hunt.balance)}

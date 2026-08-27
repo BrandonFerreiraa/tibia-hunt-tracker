@@ -1,64 +1,39 @@
-import CharacterForm from '../components/CharacterForm'
-import CharacterList from '../components/CharacterList'
 import SessionForm from '../components/SessionForm'
 import SessionList from '../components/SessionList'
 import Card from '../components/ui/Card'
+import { Select, Label } from '../components/ui/Input'
 import { useCharacters } from '../hooks/useCharacters'
 import { useSessions } from '../hooks/useSessions'
 
 function Dashboard() {
-  const {
-    characters,
-    loading: loadingCharacters,
-    activeCharacterId,
-    selectCharacter,
-    addCharacter,
-    removeCharacter,
-    refresh: refreshCharacters,
-  } = useCharacters()
+  const { characters, activeCharacterId, selectCharacter, loading: loadingCharacters } = useCharacters()
 
   const { sessions, loading: loadingSessions, addSession, toggleShare } = useSessions(activeCharacterId)
-
-  function handleRemoveCharacter(id) {
-    const character = characters.find((c) => c.id === id)
-    if (!character) return
-    if (!window.confirm(`Remover "${character.name}"? Isso também remove todas as sessões dele.`)) {
-      return
-    }
-    removeCharacter(id)
-  }
 
   return (
     <div className="flex flex-col gap-8">
       <section className="flex flex-col gap-4">
-        <h2 className="text-lg font-semibold text-text">Personagens</h2>
-
-        <Card>
-          <CharacterForm onAddCharacter={addCharacter} />
-        </Card>
+        <h2 className="text-lg font-semibold text-text">Hunts</h2>
 
         {loadingCharacters ? (
           <p className="text-sm text-text-muted">Carregando personagens...</p>
-        ) : (
-          <CharacterList
-            characters={characters}
-            activeCharacterId={activeCharacterId}
-            onSelect={selectCharacter}
-            onRemove={handleRemoveCharacter}
-            onRefresh={refreshCharacters}
-          />
-        )}
-      </section>
-
-      <section className="flex flex-col gap-4">
-        <h2 className="text-lg font-semibold text-text">Sessões</h2>
-
-        {!activeCharacterId ? (
+        ) : characters.length === 0 ? (
           <Card className="text-sm text-text-muted">
-            Cadastre e selecione um personagem acima para registrar sessões.
+            Cadastre um personagem na aba Configurações para registrar hunts.
           </Card>
         ) : (
           <>
+            <Label className="max-w-xs">
+              Personagem
+              <Select value={activeCharacterId ?? ''} onChange={(e) => selectCharacter(e.target.value)}>
+                {characters.map((character) => (
+                  <option key={character.id} value={character.id}>
+                    {character.name} ({character.world})
+                  </option>
+                ))}
+              </Select>
+            </Label>
+
             <Card>
               <SessionForm activeCharacterId={activeCharacterId} onSave={addSession} />
               <p className="mt-3 text-xs text-text-subtle">

@@ -1,4 +1,5 @@
 import { useState } from 'react'
+import { formatDuration } from '../lib/formatDuration'
 import { parseSessionText } from '../lib/sessionParser'
 import Button from './ui/Button'
 import { Input, Textarea, Label } from './ui/Input'
@@ -164,7 +165,7 @@ function SessionForm({ activeCharacterId, onSave }) {
         <div className="flex flex-col gap-3">
           <p className="rounded-lg bg-warning/10 px-3 py-2 text-sm text-warning">
             Revise os campos abaixo antes de salvar. Duração detectada:{' '}
-            {Math.round(parsed.durationSeconds / 60)} min.
+            {formatDuration(parsed.durationSeconds)}.
           </p>
 
           <Input

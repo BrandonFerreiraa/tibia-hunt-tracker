@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react'
 import { supabase } from '../lib/supabaseClient'
+import { formatDuration } from '../lib/formatDuration'
 import Card from './ui/Card'
 import Badge from './ui/Badge'
 
@@ -120,7 +121,7 @@ function SessionList({ sessions, onToggleShare }) {
                   <span className="shrink-0 text-xs text-text-subtle">{formatDate(session.started_at)}</span>
                 </div>
                 <p className="mt-1 text-sm text-text-muted">
-                  Duração: {Math.round(session.duration_seconds / 60)} min · XP/h:{' '}
+                  Duração: {formatDuration(session.duration_seconds)} · XP/h:{' '}
                   {formatNumber(session.xp_per_hour)} · Profit:{' '}
                   <span className="text-gold">{formatNumber(session.balance)}</span>
                 </p>
