@@ -16,7 +16,7 @@ export function useSessions(characterId) {
     const { data, error } = await supabase
       .from('sessions')
       .select(
-        'id, hunt_name, started_at, ended_at, duration_seconds, xp_gain, xp_per_hour, loot, supplies, balance, source'
+        'id, hunt_name, started_at, ended_at, duration_seconds, xp_gain, xp_per_hour, loot, supplies, balance, source, is_shared'
       )
       .eq('character_id', characterId)
       .order('started_at', { ascending: false })
@@ -50,5 +50,13 @@ export function useSessions(characterId) {
     return { error: null }
   }
 
-  return { sessions, loading, addSession }
+  async function toggleShare(sessionId, isShared) {
+    const { error } = await supabase.from('sessions').update({ is_shared: isShared }).eq('id', sessionId)
+    if (!error) {
+      setSessions((prev) => prev.map((s) => (s.id === sessionId ? { ...s, is_shared: isShared } : s)))
+    }
+    return { error }
+  }
+
+  return { sessions, loading, addSession, toggleShare }
 }

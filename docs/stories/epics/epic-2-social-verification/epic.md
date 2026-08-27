@@ -1,7 +1,7 @@
 ---
 id: epic-2
 title: Social & Character Verification
-status: Draft
+status: Done
 depends_on: epic-1
 ---
 
@@ -63,8 +63,8 @@ Vincular personagens a dados reais do Tibia (via TibiaData API) com verificaçã
 
 ## Compatibility Requirements
 
-- [ ] Personagens não-verificados continuam funcionando normalmente (verificação é opcional, não bloqueia o uso do Epic 1).
-- [ ] `is_shared` default `true` é comunicado claramente na UI (tooltip/onboarding) para não surpreender o usuário.
+- [x] Personagens não-verificados continuam funcionando normalmente (verificação é opcional, não bloqueia o uso do Epic 1).
+- [x] `is_shared` default `true` é comunicado claramente na UI (texto explicativo acima do formulário de sessão).
 
 ## Risk Mitigation
 
@@ -74,6 +74,10 @@ Vincular personagens a dados reais do Tibia (via TibiaData API) com verificaçã
 
 ## Definition of Done
 
-- [ ] Todas as stories com AC atendidos
-- [ ] Fluxo de verificação testado ponta-a-ponta com um personagem real
-- [ ] Feed testado com sessões públicas e privadas de múltiplas contas
+- [x] Todas as stories com AC atendidos
+- [x] Fluxo de verificação testado ponta-a-ponta com um personagem real (Brandonlee, Issobra)
+- [x] Feed testado com sessões públicas e privadas de múltiplas contas
+
+## Status: Done (2026-08-27)
+
+Stories 2.1, 2.2, 2.3 e 2.4 completas com QA Gate PASS. Verificação de personagem e sync de stats validados ponta-a-ponta com um personagem real do usuário. Ver [docs/stories/](../../) para o detalhe de cada uma.

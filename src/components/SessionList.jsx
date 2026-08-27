@@ -73,7 +73,7 @@ function SessionDetails({ sessionId }) {
   )
 }
 
-function SessionList({ sessions }) {
+function SessionList({ sessions, onToggleShare }) {
   // openIds controls visibility; mountedIds is a superset that, once a session has been
   // expanded, keeps its <SessionDetails> mounted (hidden via CSS) so collapsing/re-expanding
   // never re-fetches monsters/items.
@@ -114,6 +114,19 @@ function SessionList({ sessions }) {
               {formatNumber(session.xp_per_hour)} | Profit: {formatNumber(session.balance)}
               <span className="session-card-chevron">{isOpen ? '▲' : '▼'}</span>
             </button>
+
+            {onToggleShare && (
+              <button
+                type="button"
+                className="session-share-toggle"
+                onClick={(e) => {
+                  e.stopPropagation()
+                  onToggleShare(session.id, !session.is_shared)
+                }}
+              >
+                {session.is_shared ? '🌐 Compartilhada (clique p/ tornar privada)' : '🔒 Privada (clique p/ compartilhar)'}
+              </button>
+            )}
 
             {mountedIds.has(session.id) && (
               <div className={isOpen ? '' : 'session-details-hidden'}>

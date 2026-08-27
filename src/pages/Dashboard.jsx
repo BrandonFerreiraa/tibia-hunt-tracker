@@ -16,7 +16,7 @@ function Dashboard() {
     refresh: refreshCharacters,
   } = useCharacters()
 
-  const { sessions, loading: loadingSessions, addSession } = useSessions(activeCharacterId)
+  const { sessions, loading: loadingSessions, addSession, toggleShare } = useSessions(activeCharacterId)
 
   function handleRemoveCharacter(id) {
     const character = characters.find((c) => c.id === id)
@@ -52,7 +52,15 @@ function Dashboard() {
         ) : (
           <>
             <SessionForm activeCharacterId={activeCharacterId} onSave={addSession} />
-            {loadingSessions ? <p>Carregando sessões...</p> : <SessionList sessions={sessions} />}
+            <p className="session-share-hint">
+              Novas sessões são compartilhadas publicamente no feed por padrão — use o botão em cada
+              sessão pra torná-la privada se preferir.
+            </p>
+            {loadingSessions ? (
+              <p>Carregando sessões...</p>
+            ) : (
+              <SessionList sessions={sessions} onToggleShare={toggleShare} />
+            )}
           </>
         )}
       </section>
