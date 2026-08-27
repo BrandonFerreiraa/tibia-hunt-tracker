@@ -1,5 +1,9 @@
 import { useHuntsFeed } from '../hooks/useHuntsFeed'
 import { useHuntsFilters } from '../hooks/useHuntsFilters'
+import Card from '../components/ui/Card'
+import Button from '../components/ui/Button'
+import Badge from '../components/ui/Badge'
+import { Input, Select, Label } from '../components/ui/Input'
 
 function formatDate(iso) {
   return new Date(iso).toLocaleString('pt-BR')
@@ -23,100 +27,107 @@ function HuntsFeed() {
     filteredHunts,
   } = useHuntsFilters(hunts)
 
-  if (loading) return <p>Carregando feed...</p>
+  if (loading) return <p className="text-sm text-text-muted">Carregando feed...</p>
 
   if (hunts.length === 0) {
-    return <p>Nenhuma hunt compartilhada ainda. Seja o primeiro a compartilhar uma!</p>
+    return (
+      <Card className="text-sm text-text-muted">
+        Nenhuma hunt compartilhada ainda. Seja o primeiro a compartilhar uma!
+      </Card>
+    )
   }
 
   return (
-    <div>
-      <div className="hunts-filters">
-        <input
+    <div className="flex flex-col gap-5">
+      <Card className="flex flex-wrap items-end gap-3">
+        <Input
           type="text"
           placeholder="Filtrar por monstro"
           value={filters.monster}
           onChange={(e) => updateFilter('monster', e.target.value)}
+          className="w-44"
         />
 
-        <select value={filters.world} onChange={(e) => updateFilter('world', e.target.value)}>
+        <Select
+          value={filters.world}
+          onChange={(e) => updateFilter('world', e.target.value)}
+          className="w-auto"
+        >
           <option value="">Todos os mundos</option>
           {worlds.map((w) => (
             <option key={w} value={w}>
               {w}
             </option>
           ))}
-        </select>
+        </Select>
 
-        <select value={filters.vocation} onChange={(e) => updateFilter('vocation', e.target.value)}>
+        <Select
+          value={filters.vocation}
+          onChange={(e) => updateFilter('vocation', e.target.value)}
+          className="w-auto"
+        >
           <option value="">Todas as vocações</option>
           {vocations.map((v) => (
             <option key={v} value={v}>
               {v}
             </option>
           ))}
-        </select>
+        </Select>
 
-        <label>
+        <Label>
           De
-          <input
-            type="date"
-            value={filters.dateFrom}
-            onChange={(e) => updateFilter('dateFrom', e.target.value)}
-          />
-        </label>
+          <Input type="date" value={filters.dateFrom} onChange={(e) => updateFilter('dateFrom', e.target.value)} />
+        </Label>
 
-        <label>
+        <Label>
           Até
-          <input
-            type="date"
-            value={filters.dateTo}
-            onChange={(e) => updateFilter('dateTo', e.target.value)}
-          />
-        </label>
+          <Input type="date" value={filters.dateTo} onChange={(e) => updateFilter('dateTo', e.target.value)} />
+        </Label>
 
-        <select value={sortBy} onChange={(e) => setSortBy(e.target.value)}>
+        <Select value={sortBy} onChange={(e) => setSortBy(e.target.value)} className="w-auto">
           <option value="recent">Mais recente</option>
           <option value="profit">Maior profit/h</option>
           <option value="xp">Maior XP/h</option>
-        </select>
+        </Select>
 
         {hasActiveFilters && (
-          <button type="button" onClick={clearFilters}>
+          <Button variant="ghost" size="sm" onClick={clearFilters}>
             Limpar filtros
-          </button>
+          </Button>
         )}
-      </div>
+      </Card>
 
       {filteredHunts.length === 0 ? (
-        <p>Nenhuma hunt encontrada com esses filtros.</p>
+        <Card className="text-sm text-text-muted">Nenhuma hunt encontrada com esses filtros.</Card>
       ) : (
-        <ul className="hunts-feed">
+        <ul className="flex flex-col gap-3">
           {filteredHunts.map((hunt) => (
-            <li key={hunt.id}>
-              <div className="hunts-feed-header">
-                <strong>{hunt.hunt_name}</strong>
-                <span className="hunts-feed-date">{formatDate(hunt.started_at)}</span>
+            <Card as="li" key={hunt.id}>
+              <div className="flex items-baseline justify-between gap-2">
+                <strong className="text-sm font-semibold text-text">{hunt.hunt_name}</strong>
+                <span className="shrink-0 text-xs text-text-subtle">{formatDate(hunt.started_at)}</span>
               </div>
 
-              <p className="hunts-feed-character">
+              <p className="mt-1 text-sm text-text-muted">
                 {hunt.character_name} ({hunt.world})
                 {hunt.verified && (
-                  <span className="character-verified-badge">
-                    {' '}
+                  <Badge variant="success" className="ml-2">
                     ✔ Level {hunt.stats_level} {hunt.stats_vocation}
-                  </span>
+                  </Badge>
                 )}
               </p>
 
-              <p>
-                Duração: {Math.round(hunt.duration_seconds / 60)} min | XP/h:{' '}
-                {formatNumber(hunt.xp_per_hour)} | Profit/h: {formatNumber(hunt.profit_per_hour)} | Profit
-                total: {formatNumber(hunt.balance)}
+              <p className="mt-2 text-sm text-text-muted">
+                Duração: {Math.round(hunt.duration_seconds / 60)} min · XP/h:{' '}
+                {formatNumber(hunt.xp_per_hour)} · Profit/h:{' '}
+                <span className="font-medium text-gold">{formatNumber(hunt.profit_per_hour)}</span> · Total:{' '}
+                {formatNumber(hunt.balance)}
               </p>
 
-              {hunt.top_monsters && <p className="hunts-feed-monsters">🗡️ {hunt.top_monsters}</p>}
-            </li>
+              {hunt.top_monsters && (
+                <p className="mt-2 text-sm text-warning">🗡️ {hunt.top_monsters}</p>
+              )}
+            </Card>
           ))}
         </ul>
       )}

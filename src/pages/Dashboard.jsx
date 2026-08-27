@@ -2,6 +2,7 @@ import CharacterForm from '../components/CharacterForm'
 import CharacterList from '../components/CharacterList'
 import SessionForm from '../components/SessionForm'
 import SessionList from '../components/SessionList'
+import Card from '../components/ui/Card'
 import { useCharacters } from '../hooks/useCharacters'
 import { useSessions } from '../hooks/useSessions'
 
@@ -28,12 +29,16 @@ function Dashboard() {
   }
 
   return (
-    <div>
-      <section>
-        <h2>Personagens</h2>
-        <CharacterForm onAddCharacter={addCharacter} />
+    <div className="flex flex-col gap-8">
+      <section className="flex flex-col gap-4">
+        <h2 className="text-lg font-semibold text-text">Personagens</h2>
+
+        <Card>
+          <CharacterForm onAddCharacter={addCharacter} />
+        </Card>
+
         {loadingCharacters ? (
-          <p>Carregando personagens...</p>
+          <p className="text-sm text-text-muted">Carregando personagens...</p>
         ) : (
           <CharacterList
             characters={characters}
@@ -45,19 +50,25 @@ function Dashboard() {
         )}
       </section>
 
-      <section>
-        <h2>Sessões</h2>
+      <section className="flex flex-col gap-4">
+        <h2 className="text-lg font-semibold text-text">Sessões</h2>
+
         {!activeCharacterId ? (
-          <p>Cadastre e selecione um personagem acima para registrar sessões.</p>
+          <Card className="text-sm text-text-muted">
+            Cadastre e selecione um personagem acima para registrar sessões.
+          </Card>
         ) : (
           <>
-            <SessionForm activeCharacterId={activeCharacterId} onSave={addSession} />
-            <p className="session-share-hint">
-              Novas sessões são compartilhadas publicamente no feed por padrão — use o botão em cada
-              sessão pra torná-la privada se preferir.
-            </p>
+            <Card>
+              <SessionForm activeCharacterId={activeCharacterId} onSave={addSession} />
+              <p className="mt-3 text-xs text-text-subtle">
+                Novas sessões são compartilhadas publicamente no feed por padrão — use o botão em cada
+                sessão pra torná-la privada se preferir.
+              </p>
+            </Card>
+
             {loadingSessions ? (
-              <p>Carregando sessões...</p>
+              <p className="text-sm text-text-muted">Carregando sessões...</p>
             ) : (
               <SessionList sessions={sessions} onToggleShare={toggleShare} />
             )}

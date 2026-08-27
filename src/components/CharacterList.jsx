@@ -1,6 +1,9 @@
 import { useState } from 'react'
 import { useCharacterVerification } from '../hooks/useCharacterVerification'
 import CharacterStats from './CharacterStats'
+import Card from './ui/Card'
+import Button from './ui/Button'
+import Badge from './ui/Badge'
 
 function CharacterVerification({ character, onVerified }) {
   const { busy, generateVerificationCode, checkVerification } = useCharacterVerification()
@@ -28,61 +31,82 @@ function CharacterVerification({ character, onVerified }) {
   }
 
   if (character.verified) {
-    return <span className="character-verified-badge">✔ Verificado</span>
+    return <Badge variant="success">✔ Verificado</Badge>
   }
 
   return (
-    <div className="character-verification">
+    <div className="flex flex-col gap-2">
       {code ? (
-        <p>
-          Cole <code>{code}</code> no campo "comment" do personagem em tibia.com, salve, e clique em
-          "Conferir".
+        <p className="text-sm text-text-muted">
+          Cole{' '}
+          <code className="rounded bg-bg px-1.5 py-0.5 font-mono text-xs font-semibold text-gold">
+            {code}
+          </code>{' '}
+          no campo "comment" do personagem em tibia.com, salve, e clique em "Conferir".
         </p>
       ) : (
-        <p>Personagem ainda não verificado.</p>
+        <p className="text-sm text-text-muted">Personagem ainda não verificado.</p>
       )}
 
-      <div className="session-form-actions">
-        <button type="button" onClick={handleGenerate} disabled={busy}>
+      <div className="flex gap-2">
+        <Button variant="secondary" size="sm" onClick={handleGenerate} disabled={busy}>
           {code ? 'Gerar novo código' : 'Verificar personagem'}
-        </button>
+        </Button>
         {code && (
-          <button type="button" onClick={handleCheck} disabled={busy}>
+          <Button variant="secondary" size="sm" onClick={handleCheck} disabled={busy}>
             Conferir
-          </button>
+          </Button>
         )}
       </div>
 
-      {error && <p className="auth-error">{error}</p>}
+      {error && <p className="text-sm text-danger">{error}</p>}
     </div>
   )
 }
 
 function CharacterList({ characters, activeCharacterId, onSelect, onRemove, onRefresh }) {
   if (characters.length === 0) {
-    return <p>Nenhum personagem cadastrado ainda. Adicione o primeiro acima.</p>
+    return (
+      <Card className="text-sm text-text-muted">
+        Nenhum personagem cadastrado ainda. Adicione o primeiro acima.
+      </Card>
+    )
   }
 
   return (
-    <ul className="character-list">
-      {characters.map((character) => (
-        <li
-          key={character.id}
-          className={character.id === activeCharacterId ? 'character-active' : ''}
-        >
-          <div className="character-row">
-            <button type="button" onClick={() => onSelect(character.id)}>
-              {character.name} ({character.world})
-              {character.id === activeCharacterId ? ' ✓' : ''}
-            </button>
-            <button type="button" onClick={() => onRemove(character.id)} className="character-remove">
-              Remover
-            </button>
-          </div>
-          <CharacterVerification character={character} onVerified={onRefresh} />
-          <CharacterStats character={character} onSynced={onRefresh} />
-        </li>
-      ))}
+    <ul className="flex flex-col gap-3">
+      {characters.map((character) => {
+        const isActive = character.id === activeCharacterId
+        return (
+          <Card
+            as="li"
+            key={character.id}
+            className={isActive ? 'border-accent/50 ring-1 ring-accent/20' : ''}
+          >
+            <div className="flex items-center justify-between gap-3">
+              <button
+                type="button"
+                onClick={() => onSelect(character.id)}
+                className={`cursor-pointer text-left text-sm font-semibold transition-colors ${
+                  isActive ? 'text-accent' : 'text-text hover:text-accent'
+                }`}
+              >
+                {character.name} <span className="font-normal text-text-muted">({character.world})</span>
+                {isActive && ' ✓'}
+              </button>
+              <Button variant="danger" size="sm" onClick={() => onRemove(character.id)}>
+                Remover
+              </Button>
+            </div>
+
+            <div className="mt-3 border-t border-border pt-3">
+              <CharacterVerification character={character} onVerified={onRefresh} />
+            </div>
+
+            <CharacterStats character={character} onSynced={onRefresh} />
+          </Card>
+        )
+      })}
     </ul>
   )
 }

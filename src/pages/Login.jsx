@@ -1,5 +1,8 @@
 import { useState } from 'react'
 import { useAuth } from '../context/AuthContext'
+import Card from '../components/ui/Card'
+import Button from '../components/ui/Button'
+import { Input, Label } from '../components/ui/Input'
 
 function Login() {
   const { signIn, signUp } = useAuth()
@@ -32,39 +35,52 @@ function Login() {
   }
 
   return (
-    <div className="auth-page">
-      <h1>Tibia Hunt Tracker</h1>
-      <form onSubmit={handleSubmit}>
-        <h3>{mode === 'signin' ? 'Entrar' : 'Criar conta'}</h3>
+    <div className="flex min-h-screen flex-col items-center justify-center gap-6 bg-bg px-4">
+      <h1 className="text-2xl font-bold tracking-tight text-text">
+        Tibia<span className="text-accent"> Hunt</span> Tracker
+      </h1>
 
-        <input
-          type="email"
-          placeholder="Email"
-          value={email}
-          onChange={(e) => setEmail(e.target.value)}
-          required
-        />
+      <Card className="w-full max-w-sm">
+        <h2 className="mb-4 text-lg font-semibold text-text">
+          {mode === 'signin' ? 'Entrar na conta' : 'Criar conta'}
+        </h2>
 
-        <input
-          type="password"
-          placeholder="Senha"
-          value={password}
-          onChange={(e) => setPassword(e.target.value)}
-          required
-          minLength={6}
-        />
+        <form onSubmit={handleSubmit} className="flex flex-col gap-3">
+          <Label>
+            Email
+            <Input
+              type="email"
+              placeholder="voce@email.com"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              required
+            />
+          </Label>
 
-        {error && <p className="auth-error">{error}</p>}
-        {info && <p className="auth-info">{info}</p>}
+          <Label>
+            Senha
+            <Input
+              type="password"
+              placeholder="••••••••"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              required
+              minLength={6}
+            />
+          </Label>
 
-        <button type="submit" disabled={submitting}>
-          {mode === 'signin' ? 'Entrar' : 'Criar conta'}
-        </button>
-      </form>
+          {error && <p className="text-sm text-danger">{error}</p>}
+          {info && <p className="text-sm text-success">{info}</p>}
+
+          <Button type="submit" disabled={submitting} className="mt-2 w-full">
+            {mode === 'signin' ? 'Entrar' : 'Criar conta'}
+          </Button>
+        </form>
+      </Card>
 
       <button
         type="button"
-        className="auth-toggle"
+        className="cursor-pointer text-sm text-text-muted underline decoration-dotted hover:text-accent"
         onClick={() => setMode(mode === 'signin' ? 'signup' : 'signin')}
       >
         {mode === 'signin' ? 'Não tem conta? Criar uma' : 'Já tem conta? Entrar'}

@@ -1,5 +1,7 @@
 import { useState } from 'react'
 import { parseSessionText } from '../lib/sessionParser'
+import Button from './ui/Button'
+import { Input, Textarea, Label } from './ui/Input'
 
 const NUMERIC_FIELDS = [
   ['xpGain', 'XP Gain'],
@@ -136,133 +138,132 @@ function SessionForm({ activeCharacterId, onSave }) {
   }
 
   return (
-    <div className="session-form">
-      <h3>Registrar Sessão</h3>
+    <div>
+      <h3 className="mb-3 text-sm font-semibold text-text">Registrar Sessão</h3>
 
       {mode === 'paste' && (
-        <>
-          <textarea
-            rows={10}
+        <div className="flex flex-col gap-3">
+          <Textarea
+            rows={8}
             placeholder="Cole aqui o texto do Session Analyser..."
             value={rawText}
             onChange={(e) => setRawText(e.target.value)}
           />
-          <div className="session-form-actions">
-            <button type="button" onClick={handleAnalyze} disabled={!rawText.trim()}>
+          <div className="flex gap-2">
+            <Button onClick={handleAnalyze} disabled={!rawText.trim()}>
               Analisar
-            </button>
-            <button type="button" onClick={() => setMode('manual')} className="session-form-secondary">
+            </Button>
+            <Button variant="secondary" onClick={() => setMode('manual')}>
               Preencher manualmente
-            </button>
+            </Button>
           </div>
-        </>
+        </div>
       )}
 
       {mode === 'preview' && parsed && (
-        <div className="session-preview">
-          <p className="session-preview-hint">
+        <div className="flex flex-col gap-3">
+          <p className="rounded-lg bg-warning/10 px-3 py-2 text-sm text-warning">
             Revise os campos abaixo antes de salvar. Duração detectada:{' '}
             {Math.round(parsed.durationSeconds / 60)} min.
           </p>
 
-          <input
+          <Input
             type="text"
             placeholder="Nome da hunt"
             value={huntName}
             onChange={(e) => setHuntName(e.target.value)}
           />
 
-          <div className="session-field-grid">
+          <div className="grid grid-cols-2 gap-2 sm:grid-cols-3">
             {NUMERIC_FIELDS.map(([key, label]) => (
-              <label key={key}>
+              <Label key={key}>
                 {label}
-                <input
-                  type="number"
-                  value={parsed[key]}
-                  onChange={(e) => updateParsedField(key, e.target.value)}
-                />
-              </label>
+                <Input type="number" value={parsed[key]} onChange={(e) => updateParsedField(key, e.target.value)} />
+              </Label>
             ))}
           </div>
 
-          <p>{parsed.monsters.length} tipo(s) de monstro morto(s), {parsed.items.length} tipo(s) de item lootado(s).</p>
+          <p className="text-xs text-text-muted">
+            {parsed.monsters.length} tipo(s) de monstro morto(s), {parsed.items.length} tipo(s) de item
+            lootado(s).
+          </p>
 
-          {error && <p className="auth-error">{error}</p>}
+          {error && <p className="text-sm text-danger">{error}</p>}
 
-          <div className="session-form-actions">
-            <button type="button" onClick={handleSave} disabled={saving}>
+          <div className="flex gap-2">
+            <Button onClick={handleSave} disabled={saving}>
               Salvar Sessão
-            </button>
-            <button type="button" onClick={() => setMode('paste')} className="session-form-secondary">
+            </Button>
+            <Button variant="secondary" onClick={() => setMode('paste')}>
               Cancelar
-            </button>
+            </Button>
           </div>
         </div>
       )}
 
       {mode === 'manual' && (
-        <div className="session-manual">
-          <p className="session-preview-hint">
+        <div className="flex flex-col gap-3">
+          <p className="rounded-lg bg-warning/10 px-3 py-2 text-sm text-warning">
             {rawText.trim()
               ? 'Não consegui reconhecer o texto colado. Preencha manualmente (o texto colado continua salvo abaixo, caso queira tentar novamente).'
               : 'Preenchimento manual da sessão.'}
           </p>
 
-          <input
+          <Input
             type="text"
             placeholder="Nome da hunt"
             value={huntName}
             onChange={(e) => setHuntName(e.target.value)}
           />
 
-          <label>
+          <Label className="max-w-40">
             Duração (minutos)
-            <input
-              type="number"
-              value={manualDuration}
-              onChange={(e) => setManualDuration(e.target.value)}
-            />
-          </label>
+            <Input type="number" value={manualDuration} onChange={(e) => setManualDuration(e.target.value)} />
+          </Label>
 
-          <div className="session-field-grid">
+          <div className="grid grid-cols-2 gap-2 sm:grid-cols-3">
             {NUMERIC_FIELDS.map(([key, label]) => (
-              <label key={key}>
+              <Label key={key}>
                 {label}
-                <input
+                <Input
                   type="number"
                   value={manualFields[key]}
                   onChange={(e) => updateManualField(key, e.target.value)}
                 />
-              </label>
+              </Label>
             ))}
           </div>
 
           {rawText.trim() && (
-            <details>
-              <summary>Texto colado original</summary>
-              <textarea rows={6} value={rawText} onChange={(e) => setRawText(e.target.value)} />
-              <button type="button" onClick={handleAnalyze}>
+            <details className="text-sm text-text-muted">
+              <summary className="cursor-pointer">Texto colado original</summary>
+              <Textarea
+                rows={6}
+                value={rawText}
+                onChange={(e) => setRawText(e.target.value)}
+                className="mt-2"
+              />
+              <Button variant="secondary" size="sm" onClick={handleAnalyze} className="mt-2">
                 Tentar analisar de novo
-              </button>
+              </Button>
             </details>
           )}
 
-          {error && <p className="auth-error">{error}</p>}
+          {error && <p className="text-sm text-danger">{error}</p>}
 
-          <div className="session-form-actions">
-            <button type="button" onClick={handleSave} disabled={saving}>
+          <div className="flex gap-2">
+            <Button onClick={handleSave} disabled={saving}>
               Salvar Sessão
-            </button>
-            <button
-              type="button"
+            </Button>
+            <Button
+              variant="secondary"
               onClick={() => {
                 setMode('paste')
                 setError(null)
               }}
-              className="session-form-secondary"
             >
               Cancelar
-            </button>
+            </Button>
           </div>
         </div>
       )}

@@ -1,5 +1,7 @@
 import { useEffect, useState } from 'react'
 import { supabase } from '../lib/supabaseClient'
+import Card from './ui/Card'
+import Badge from './ui/Badge'
 
 function formatDate(iso) {
   return new Date(iso).toLocaleString('pt-BR')
@@ -34,18 +36,20 @@ function SessionDetails({ sessionId }) {
     }
   }, [sessionId])
 
-  if (loading) return <p>Carregando detalhes...</p>
+  if (loading) return <p className="mt-3 text-sm text-text-muted">Carregando detalhes...</p>
 
   const { monsters, items } = details
 
   return (
-    <div className="session-details">
+    <div className="mt-3 grid grid-cols-1 gap-4 border-t border-border pt-3 sm:grid-cols-2">
       <div>
-        <h4>Monstros mortos</h4>
+        <h4 className="mb-1.5 text-xs font-semibold uppercase tracking-wide text-text-subtle">
+          Monstros mortos
+        </h4>
         {monsters.length === 0 ? (
-          <p>Nenhum monstro registrado para esta sessão.</p>
+          <p className="text-sm text-text-muted">Nenhum monstro registrado para esta sessão.</p>
         ) : (
-          <ul>
+          <ul className="flex flex-col gap-1 text-sm text-text-muted">
             {monsters.map((m) => (
               <li key={m.monster_name}>
                 {formatNumber(m.quantity)}x {m.monster_name}
@@ -56,11 +60,13 @@ function SessionDetails({ sessionId }) {
       </div>
 
       <div>
-        <h4>Itens lootados</h4>
+        <h4 className="mb-1.5 text-xs font-semibold uppercase tracking-wide text-text-subtle">
+          Itens lootados
+        </h4>
         {items.length === 0 ? (
-          <p>Nenhum item registrado para esta sessão.</p>
+          <p className="text-sm text-text-muted">Nenhum item registrado para esta sessão.</p>
         ) : (
-          <ul>
+          <ul className="flex flex-col gap-1 text-sm text-text-muted">
             {items.map((i) => (
               <li key={i.item_name}>
                 {formatNumber(i.quantity)}x {i.item_name}
@@ -94,46 +100,57 @@ function SessionList({ sessions, onToggleShare }) {
   }
 
   if (sessions.length === 0) {
-    return <p>Nenhuma sessão registrada ainda para este personagem.</p>
+    return <Card className="text-sm text-text-muted">Nenhuma sessão registrada ainda para este personagem.</Card>
   }
 
   return (
-    <ul className="session-list">
+    <ul className="flex flex-col gap-3">
       {sessions.map((session) => {
         const isOpen = openIds.has(session.id)
         return (
-          <li key={session.id}>
-            <button
-              type="button"
-              className="session-card-toggle"
-              onClick={() => toggleExpanded(session.id)}
-            >
-              <strong>{session.hunt_name}</strong> — {formatDate(session.started_at)}
-              <br />
-              Duração: {Math.round(session.duration_seconds / 60)} min | XP/h:{' '}
-              {formatNumber(session.xp_per_hour)} | Profit: {formatNumber(session.balance)}
-              <span className="session-card-chevron">{isOpen ? '▲' : '▼'}</span>
-            </button>
+          <Card as="li" key={session.id}>
+            <div className="flex items-start justify-between gap-3">
+              <button
+                type="button"
+                className="flex-1 cursor-pointer text-left"
+                onClick={() => toggleExpanded(session.id)}
+              >
+                <div className="flex items-baseline justify-between gap-2">
+                  <strong className="text-sm font-semibold text-text">{session.hunt_name}</strong>
+                  <span className="shrink-0 text-xs text-text-subtle">{formatDate(session.started_at)}</span>
+                </div>
+                <p className="mt-1 text-sm text-text-muted">
+                  Duração: {Math.round(session.duration_seconds / 60)} min · XP/h:{' '}
+                  {formatNumber(session.xp_per_hour)} · Profit:{' '}
+                  <span className="text-gold">{formatNumber(session.balance)}</span>
+                </p>
+              </button>
+              <span className="mt-0.5 shrink-0 text-xs text-text-subtle">{isOpen ? '▲' : '▼'}</span>
+            </div>
 
             {onToggleShare && (
               <button
                 type="button"
-                className="session-share-toggle"
                 onClick={(e) => {
                   e.stopPropagation()
                   onToggleShare(session.id, !session.is_shared)
                 }}
+                className="mt-2 cursor-pointer"
               >
-                {session.is_shared ? '🌐 Compartilhada (clique p/ tornar privada)' : '🔒 Privada (clique p/ compartilhar)'}
+                <Badge variant={session.is_shared ? 'success' : 'neutral'}>
+                  {session.is_shared
+                    ? '🌐 Compartilhada — clique p/ tornar privada'
+                    : '🔒 Privada — clique p/ compartilhar'}
+                </Badge>
               </button>
             )}
 
             {mountedIds.has(session.id) && (
-              <div className={isOpen ? '' : 'session-details-hidden'}>
+              <div className={isOpen ? '' : 'hidden'}>
                 <SessionDetails sessionId={session.id} />
               </div>
             )}
-          </li>
+          </Card>
         )
       })}
     </ul>
