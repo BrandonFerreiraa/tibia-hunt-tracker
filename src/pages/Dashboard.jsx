@@ -13,6 +13,7 @@ function Dashboard() {
     selectCharacter,
     addCharacter,
     removeCharacter,
+    refresh: refreshCharacters,
   } = useCharacters()
 
   const { sessions, loading: loadingSessions, addSession } = useSessions(activeCharacterId)
@@ -39,6 +40,7 @@ function Dashboard() {
             activeCharacterId={activeCharacterId}
             onSelect={selectCharacter}
             onRemove={handleRemoveCharacter}
+            onRefresh={refreshCharacters}
           />
         )}
       </section>

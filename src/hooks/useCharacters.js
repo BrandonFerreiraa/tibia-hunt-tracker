@@ -14,7 +14,11 @@ export function useCharacters() {
     setLoading(true)
     const { data, error } = await supabase
       .from('characters')
-      .select('id, name, world, created_at')
+      .select(
+        `id, name, world, created_at, verified, verification_code, verification_code_expires_at,
+         stats_level, stats_vocation, stats_world, stats_guild_name, stats_achievement_points, stats_updated_at,
+         stats_skill_category, stats_skill_value, stats_skill_rank, stats_skill_checked_at`
+      )
       .order('created_at', { ascending: true })
 
     if (!error) setCharacters(data)
@@ -47,7 +51,11 @@ export function useCharacters() {
     const { data, error } = await supabase
       .from('characters')
       .insert({ name, world })
-      .select('id, name, world, created_at')
+      .select(
+        `id, name, world, created_at, verified, verification_code, verification_code_expires_at,
+         stats_level, stats_vocation, stats_world, stats_guild_name, stats_achievement_points, stats_updated_at,
+         stats_skill_category, stats_skill_value, stats_skill_rank, stats_skill_checked_at`
+      )
       .single()
 
     if (!error) {
@@ -76,5 +84,6 @@ export function useCharacters() {
     selectCharacter,
     addCharacter,
     removeCharacter,
+    refresh: loadCharacters,
   }
 }
