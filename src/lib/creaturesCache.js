@@ -14,6 +14,19 @@ function fromRow(row) {
     immune: row.immune ?? [],
     strong: row.strong ?? [],
     weakness: row.weakness ?? [],
+    // Percentuais exatos vêm do TibiaWiki (Fandom), fonte separada da
+    // TibiaData — null quando a wiki não tem o campo ou a busca falhou
+    // (client cai pro badge qualitativo immune/strong/weakness acima).
+    resistancePct: {
+      physical: row.physical_pct,
+      fire: row.fire_pct,
+      earth: row.earth_pct,
+      energy: row.energy_pct,
+      ice: row.ice_pct,
+      holy: row.holy_pct,
+      death: row.death_pct,
+    },
+    hasWikiData: row.wiki_synced_at != null,
   }
 }
 
