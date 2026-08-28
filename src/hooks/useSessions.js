@@ -21,7 +21,27 @@ export function useSessions(characterId) {
       .eq('character_id', characterId)
       .order('started_at', { ascending: false })
 
-    if (!error) setSessions(data)
+    if (error) {
+      setLoading(false)
+      return
+    }
+
+    const sessionIds = data.map((s) => s.id)
+    let monsterNamesBySession = {}
+
+    if (sessionIds.length > 0) {
+      const { data: monsterRows } = await supabase
+        .from('session_monsters')
+        .select('session_id, monster_name')
+        .in('session_id', sessionIds)
+
+      monsterNamesBySession = (monsterRows ?? []).reduce((acc, row) => {
+        ;(acc[row.session_id] ??= []).push(row.monster_name)
+        return acc
+      }, {})
+    }
+
+    setSessions(data.map((s) => ({ ...s, monster_names: monsterNamesBySession[s.id] ?? [] })))
     setLoading(false)
   }, [characterId])
 

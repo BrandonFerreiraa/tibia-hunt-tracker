@@ -1,23 +1,30 @@
+import { useState } from 'react'
 import { useHuntsFeed } from '../hooks/useHuntsFeed'
 import { useHuntsFilters } from '../hooks/useHuntsFilters'
 import { useCharacters } from '../hooks/useCharacters'
-import { formatDuration } from '../lib/formatDuration'
 import Card from '../components/ui/Card'
 import Button from '../components/ui/Button'
 import Badge from '../components/ui/Badge'
+import HuntCard from '../components/HuntCard'
+import HuntDetailModal from '../components/HuntDetailModal'
 import { Input, Select, Label } from '../components/ui/Input'
 
-function formatDate(iso) {
-  return new Date(iso).toLocaleString('pt-BR')
-}
-
-function formatNumber(n) {
-  return n.toLocaleString('pt-BR')
+function toHunt(hunt) {
+  return {
+    huntName: hunt.hunt_name,
+    startedAt: hunt.started_at,
+    durationSeconds: hunt.duration_seconds,
+    xpPerHour: hunt.xp_per_hour,
+    profitPerHour: hunt.profit_per_hour,
+    balance: hunt.balance,
+    monsterNames: hunt.all_monster_names,
+  }
 }
 
 function HuntsFeed() {
   const { hunts, loading } = useHuntsFeed()
   const { characters } = useCharacters()
+  const [selectedHuntId, setSelectedHuntId] = useState(null)
   const ownCharacterIds = new Set(characters.map((c) => c.id))
   const {
     filters,
@@ -40,6 +47,8 @@ function HuntsFeed() {
       </Card>
     )
   }
+
+  const selectedHunt = hunts.find((h) => h.id === selectedHuntId)
 
   return (
     <div className="flex flex-col gap-5">
@@ -104,41 +113,37 @@ function HuntsFeed() {
       {filteredHunts.length === 0 ? (
         <Card className="text-sm text-text-muted">Nenhuma hunt encontrada com esses filtros.</Card>
       ) : (
-        <ul className="flex flex-col gap-3">
+        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
           {filteredHunts.map((hunt) => (
-            <Card as="li" key={hunt.id}>
-              <div className="flex items-baseline justify-between gap-2">
-                <strong className="text-sm font-semibold text-text">{hunt.hunt_name}</strong>
-                <span className="shrink-0 text-xs text-text-subtle">{formatDate(hunt.started_at)}</span>
-              </div>
-
-              <p className="mt-1 text-sm text-text-muted">
-                {hunt.character_name} ({hunt.world})
-                {ownCharacterIds.has(hunt.character_id) && (
-                  <Badge variant="gold" className="ml-2">
-                    Sua hunt
-                  </Badge>
-                )}
-                {hunt.verified && (
-                  <Badge variant="success" className="ml-2">
-                    ✔ Level {hunt.stats_level} {hunt.stats_vocation}
-                  </Badge>
-                )}
-              </p>
-
-              <p className="mt-2 text-sm text-text-muted">
-                Duração: {formatDuration(hunt.duration_seconds)} · XP/h:{' '}
-                {formatNumber(hunt.xp_per_hour)} · Profit/h:{' '}
-                <span className="font-medium text-gold">{formatNumber(hunt.profit_per_hour)}</span> · Total:{' '}
-                {formatNumber(hunt.balance)}
-              </p>
-
-              {hunt.top_monsters && (
-                <p className="mt-2 text-sm text-warning">🗡️ {hunt.top_monsters}</p>
-              )}
-            </Card>
+            <HuntCard
+              key={hunt.id}
+              hunt={toHunt(hunt)}
+              onClick={() => setSelectedHuntId(hunt.id)}
+              badges={
+                <>
+                  <span>
+                    {hunt.character_name} ({hunt.world})
+                  </span>
+                  {ownCharacterIds.has(hunt.character_id) && <Badge variant="gold">Sua hunt</Badge>}
+                  {hunt.verified && (
+                    <Badge variant="success">
+                      ✔ Level {hunt.stats_level} {hunt.stats_vocation}
+                    </Badge>
+                  )}
+                </>
+              }
+            />
           ))}
-        </ul>
+        </div>
+      )}
+
+      {selectedHunt && (
+        <HuntDetailModal
+          sessionId={selectedHunt.id}
+          hunt={toHunt(selectedHunt)}
+          onClose={() => setSelectedHuntId(null)}
+          scope="public"
+        />
       )}
     </div>
   )
