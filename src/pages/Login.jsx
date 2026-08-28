@@ -36,9 +36,7 @@ function Login() {
 
   return (
     <div className="flex min-h-screen flex-col items-center justify-center gap-6 bg-bg px-4">
-      <h1 className="text-2xl font-bold tracking-tight text-text">
-        Tibia<span className="text-accent"> Hunt</span> Tracker
-      </h1>
+      <img src="/logo.png" alt="TibiaHunt" className="w-full max-w-sm" />
 
       <Card className="w-full max-w-sm">
         <h2 className="mb-4 text-lg font-semibold text-text">

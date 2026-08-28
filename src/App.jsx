@@ -21,7 +21,7 @@ function App() {
         <div className="mx-auto flex max-w-5xl items-center justify-between gap-4 px-4 py-3 sm:px-6">
           <div className="flex items-center gap-6">
             <h1 className="text-base font-bold tracking-tight text-text">
-              Tibia<span className="text-accent"> Hunt</span> Tracker
+              Tibia<span className="text-accent">Hunt</span>
             </h1>
 
             <nav className="flex items-center gap-1">
