@@ -3,6 +3,7 @@ import { useProfitStats } from '../hooks/useProfitStats'
 import { useCharacters } from '../hooks/useCharacters'
 import { groupSessionsByDay, dayKey } from '../lib/groupSessionsByDay'
 import Card from '../components/ui/Card'
+import ProfitBarChart from '../components/ProfitBarChart'
 
 function formatNumber(n) {
   return n.toLocaleString('pt-BR')
@@ -81,30 +82,19 @@ function Profit() {
         ))}
       </div>
 
-      <Card>
-        <p className="text-sm text-text-muted">Profit do período ({TABS.find((t) => t.key === tab).label.toLowerCase()})</p>
-        <p className="text-2xl font-semibold text-gold">{formatNumber(periodTotal)}</p>
+      <Card className="text-center">
+        <p className="text-sm text-text-muted">Profit {TABS.find((t) => t.key === tab).label.toLowerCase()}</p>
+        <p className={`text-5xl font-bold ${periodTotal < 0 ? 'text-danger' : 'text-gold'}`}>
+          {formatNumber(periodTotal)}
+        </p>
       </Card>
 
       {daysInTab.length === 0 ? (
         <Card className="text-sm text-text-muted">Nenhuma hunt registrada nesse período.</Card>
       ) : (
-        <ul className="flex flex-col gap-2">
-          {daysInTab.map((day) => (
-            <Card as="li" key={day.date} className="p-0">
-              <button
-                type="button"
-                onClick={() => setSelectedDate(day.date)}
-                className={`flex w-full cursor-pointer items-center justify-between px-5 py-3 text-left text-sm ${
-                  day.date === selectedDate ? 'text-accent' : 'text-text'
-                }`}
-              >
-                <span className="font-medium">{formatDayLabel(day.date)}</span>
-                <span className="text-gold">{formatNumber(day.profit)}</span>
-              </button>
-            </Card>
-          ))}
-        </ul>
+        <Card>
+          <ProfitBarChart days={daysInTab} selectedDate={selectedDate} onSelectDate={setSelectedDate} />
+        </Card>
       )}
 
       <section className="flex flex-col gap-3">
@@ -112,7 +102,10 @@ function Profit() {
 
         <Card>
           <p className="text-sm text-text-muted">
-            Profit total: <span className="font-semibold text-gold">{formatNumber(selectedDay.profit)}</span>
+            Profit total:{' '}
+            <span className={`font-semibold ${selectedDay.profit < 0 ? 'text-danger' : 'text-gold'}`}>
+              {formatNumber(selectedDay.profit)}
+            </span>
           </p>
         </Card>
 
@@ -126,7 +119,9 @@ function Profit() {
                   <strong className="text-text">{session.hunt_name}</strong>{' '}
                   <span className="text-text-muted">({characterNames.get(session.character_id)})</span>
                 </div>
-                <span className="text-gold">{formatNumber(session.balance)}</span>
+                <span className={session.balance < 0 ? 'text-danger' : 'text-gold'}>
+                  {formatNumber(session.balance)}
+                </span>
               </Card>
             ))}
           </ul>

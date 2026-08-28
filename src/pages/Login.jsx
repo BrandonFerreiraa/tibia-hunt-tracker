@@ -9,6 +9,7 @@ function Login() {
   const [mode, setMode] = useState('signin')
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
+  const [characterName, setCharacterName] = useState('')
   const [error, setError] = useState(null)
   const [info, setInfo] = useState(null)
   const [submitting, setSubmitting] = useState(false)
@@ -30,6 +31,11 @@ function Login() {
     }
 
     if (mode === 'signup') {
+      // Consumido pela tela de cadastro de personagem (Onboarding) assim que a sessão
+      // existir — o usuário não precisa digitar o nome do personagem de novo lá.
+      if (characterName.trim()) {
+        localStorage.setItem('pendingCharacterName', characterName.trim())
+      }
       setInfo('Conta criada. Verifique seu email para confirmar antes de entrar.')
     }
   }
@@ -66,6 +72,19 @@ function Login() {
               minLength={6}
             />
           </Label>
+
+          {mode === 'signup' && (
+            <Label>
+              Nome do personagem
+              <Input
+                type="text"
+                placeholder="Nome exatamente como no Tibia"
+                value={characterName}
+                onChange={(e) => setCharacterName(e.target.value)}
+                required
+              />
+            </Label>
+          )}
 
           {error && <p className="text-sm text-danger">{error}</p>}
           {info && <p className="text-sm text-success">{info}</p>}

@@ -2,6 +2,7 @@ import { useState } from 'react'
 import { useHuntsFeed } from '../hooks/useHuntsFeed'
 import { useHuntsFilters } from '../hooks/useHuntsFilters'
 import { useCharacters } from '../hooks/useCharacters'
+import { SKILL_CATEGORY_LABELS } from '../hooks/useCharacterStats'
 import Card from '../components/ui/Card'
 import Button from '../components/ui/Button'
 import Badge from '../components/ui/Badge'
@@ -128,6 +129,12 @@ function HuntsFeed() {
                   {hunt.verified && (
                     <Badge variant="success">
                       ✔ Level {hunt.stats_level} {hunt.stats_vocation}
+                    </Badge>
+                  )}
+                  {hunt.stats_skill_category && (
+                    <Badge variant="gold">
+                      🏆 {SKILL_CATEGORY_LABELS[hunt.stats_skill_category]}: {hunt.stats_skill_value} (Top{' '}
+                      {hunt.stats_skill_rank})
                     </Badge>
                   )}
                 </>

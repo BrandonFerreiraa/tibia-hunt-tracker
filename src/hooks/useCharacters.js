@@ -74,7 +74,7 @@ export function useCharacters() {
       selectCharacter(data.id)
     }
 
-    return { error }
+    return { data, error }
   }
 
   async function updateCharacterType(id, type) {

@@ -1,6 +1,9 @@
 import { useState } from 'react'
 import { useAuth } from './context/AuthContext'
+import { useCharacters } from './hooks/useCharacters'
+import { useTheme } from './hooks/useTheme'
 import Login from './pages/Login'
+import Onboarding from './pages/Onboarding'
 import Dashboard from './pages/Dashboard'
 import HuntsFeed from './pages/HuntsFeed'
 import Profit from './pages/Profit'
@@ -9,11 +12,19 @@ import Button from './components/ui/Button'
 
 function App() {
   const { user, loading, signOut } = useAuth()
+  const { characters, loading: loadingCharacters, addCharacter, refresh } = useCharacters()
+  const { theme, setTheme } = useTheme()
   const [view, setView] = useState('dashboard')
 
   if (loading) return null
 
   if (!user) return <Login />
+
+  if (loadingCharacters) return null
+
+  if (!characters.some((c) => c.verified)) {
+    return <Onboarding addCharacter={addCharacter} refresh={refresh} />
+  }
 
   return (
     <div className="min-h-screen bg-bg">
@@ -76,7 +87,7 @@ function App() {
         {view === 'dashboard' && <Dashboard />}
         {view === 'feed' && <HuntsFeed />}
         {view === 'profit' && <Profit />}
-        {view === 'settings' && <Settings />}
+        {view === 'settings' && <Settings theme={theme} setTheme={setTheme} />}
       </main>
     </div>
   )

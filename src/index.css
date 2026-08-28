@@ -4,10 +4,13 @@
 @theme {
   --font-sans: 'Inter', ui-sans-serif, system-ui, sans-serif;
 
+  /* Dark theme (default). --color-border raised from #24242e (Story 5.4:
+     contrast 1.21:1 against --color-surface, effectively invisible) to
+     #656580 (3.31:1, clears WCAG 1.4.11 non-text contrast). */
   --color-bg: #0a0a0f;
   --color-surface: #121218;
   --color-surface-hover: #1a1a22;
-  --color-border: #24242e;
+  --color-border: #656580;
 
   --color-text: #e4e4e9;
   --color-text-muted: #8b8b9a;
@@ -21,6 +24,32 @@
   --color-danger: #f87171;
   --color-warning: #fbbf24;
   --color-gold: #eab308;
+}
+
+/* Light theme (Story 5.4). Every value below was validated with the dataviz
+   skill's contrast() (WCAG): border >= 3:1 against --color-surface (non-text
+   contrast), text/semantic colors >= 4.5:1 against --color-surface (normal
+   text contrast). The dark-theme hues for success/danger/warning/gold/accent
+   are too light to read as text on a white surface, so this theme uses
+   darker shades of the same hues instead of the dark-theme values verbatim. */
+:root[data-theme='light'] {
+  --color-bg: #f7f7fb;
+  --color-surface: #ffffff;
+  --color-surface-hover: #f0f0f5;
+  --color-border: #8e8ea5;
+
+  --color-text: #16161d;
+  --color-text-muted: #5c5c6b;
+  --color-text-subtle: #73738a;
+
+  --color-accent: #5a56ee;
+  --color-accent-hover: #6d69f0;
+  --color-accent-muted: #5a56ee1a;
+
+  --color-success: #047857;
+  --color-danger: #dc2626;
+  --color-warning: #b45309;
+  --color-gold: #a16207;
 }
 
 body {

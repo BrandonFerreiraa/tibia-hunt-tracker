@@ -1,23 +1,57 @@
 import { useState } from 'react'
+import { fetchCharacter } from '../lib/tibiaDataClient'
 import { useCharacterVerification } from '../hooks/useCharacterVerification'
+import { useCharacterStats, getAutoSkillCategory, isKnight, SKILL_CATEGORY_LABELS } from '../hooks/useCharacterStats'
 import CharacterStats from './CharacterStats'
 import Card from './ui/Card'
 import Button from './ui/Button'
 import Badge from './ui/Badge'
+import CopyButton from './ui/CopyButton'
+import { Select, Label } from './ui/Input'
+
+const KNIGHT_CATEGORIES = ['swordfighting', 'axefighting', 'clubfighting']
 
 function CharacterVerification({ character, onVerified }) {
   const { busy, generateVerificationCode, checkVerification } = useCharacterVerification()
+  const { syncProfile, syncSkill } = useCharacterStats()
   const [code, setCode] = useState(character.verification_code)
   const [error, setError] = useState(null)
+  const [askingKnightCategory, setAskingKnightCategory] = useState(false)
+  const [knightCategory, setKnightCategory] = useState(KNIGHT_CATEGORIES[0])
+  const [skillCategory, setSkillCategory] = useState(null)
 
-  async function handleGenerate() {
-    setError(null)
+  async function generateCodeWithCategory(category) {
+    setSkillCategory(category)
     const result = await generateVerificationCode(character.id)
     if (result.error) {
       setError(result.error.message)
       return
     }
     setCode(result.code)
+  }
+
+  async function handleGenerate() {
+    setError(null)
+
+    let info = null
+    try {
+      info = await fetchCharacter(character.name)
+    } catch {
+      // Best-effort: se a busca falhar aqui, ainda dá pra gerar o código normalmente
+      // (a skill é auto-detectada de novo, sem o ajuste manual de Knight, ao confirmar).
+    }
+
+    if (info && isKnight(info.vocation)) {
+      setAskingKnightCategory(true)
+      return
+    }
+
+    await generateCodeWithCategory(info ? getAutoSkillCategory(info.vocation) : null)
+  }
+
+  async function handleConfirmKnightCategory() {
+    setAskingKnightCategory(false)
+    await generateCodeWithCategory(knightCategory)
   }
 
   async function handleCheck() {
@@ -27,11 +61,36 @@ function CharacterVerification({ character, onVerified }) {
       setError(result.error.message)
       return
     }
+    // Best-effort: uma falha de sync não deve impedir a verificação já confirmada.
+    const profileResult = await syncProfile(character.id)
+    const category = skillCategory ?? getAutoSkillCategory(profileResult.data?.vocation)
+    if (category) await syncSkill(character.id, category)
     onVerified()
   }
 
   if (character.verified) {
     return <Badge variant="success">✔ Verificado</Badge>
+  }
+
+  if (askingKnightCategory) {
+    return (
+      <div className="flex flex-col gap-2">
+        <p className="text-sm text-text-muted">Qual skill você mais usa pra hunt?</p>
+        <Label className="max-w-40">
+          Skill
+          <Select value={knightCategory} onChange={(e) => setKnightCategory(e.target.value)}>
+            {KNIGHT_CATEGORIES.map((cat) => (
+              <option key={cat} value={cat}>
+                {SKILL_CATEGORY_LABELS[cat]}
+              </option>
+            ))}
+          </Select>
+        </Label>
+        <Button variant="secondary" size="sm" onClick={handleConfirmKnightCategory} disabled={busy} className="w-fit">
+          Continuar
+        </Button>
+      </div>
+    )
   }
 
   return (
@@ -42,6 +101,7 @@ function CharacterVerification({ character, onVerified }) {
           <code className="rounded bg-bg px-1.5 py-0.5 font-mono text-xs font-semibold text-gold">
             {code}
           </code>{' '}
+          <CopyButton text={code} />{' '}
           no campo "comment" do personagem em tibia.com, salve, e clique em "Conferir".
         </p>
       ) : (
