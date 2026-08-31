@@ -48,10 +48,13 @@ const ELEMENTS = [
   },
 ]
 
+// Acima de 100% (o monstro apanha MAIS desse elemento — ponto fraco a
+// explorar) fica verde; abaixo de 100% (resistente/imune) fica vermelho;
+// exatamente 100% (neutro) fica cinza.
 const STATUS_STYLES = {
-  immune: 'bg-surface-hover text-text-subtle border-border',
-  strong: 'bg-success/10 text-success border-success/30',
-  weakness: 'bg-danger/10 text-danger border-danger/30',
+  weak: 'bg-success/10 text-success border-success/30',
+  resistant: 'bg-danger/10 text-danger border-danger/30',
+  neutral: 'bg-surface-hover text-text-subtle border-border',
 }
 
 const STATUS_LABEL = {
@@ -74,14 +77,15 @@ function elementBadge(creature, key) {
   const pct = creature.resistancePct?.[key]
 
   if (typeof pct === 'number') {
-    if (pct === 100) return null // neutro, não vale mostrar
-    const status = pct === 0 ? 'immune' : pct < 100 ? 'strong' : 'weakness'
+    const status = pct === 100 ? 'neutral' : pct > 100 ? 'weak' : 'resistant'
     return { status, text: `${pct}%` }
   }
 
-  const status = qualitativeStatus(creature, key)
-  if (!status) return null
-  return { status, text: STATUS_LABEL[status] }
+  const qualitative = qualitativeStatus(creature, key)
+  if (!qualitative) return null
+  // weakness (apanha mais) -> verde; strong/immune (resistente/imune) -> vermelho
+  const status = qualitative === 'weakness' ? 'weak' : 'resistant'
+  return { status, text: STATUS_LABEL[qualitative] }
 }
 
 function formatNumber(n) {
