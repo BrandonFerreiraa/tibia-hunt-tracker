@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { useAuth } from './context/AuthContext'
 import { useCharacters } from './hooks/useCharacters'
 import { useTheme } from './hooks/useTheme'
@@ -15,6 +15,15 @@ function App() {
   const { characters, loading: loadingCharacters, addCharacter, refresh } = useCharacters()
   const { theme, setTheme } = useTheme()
   const [view, setView] = useState('dashboard')
+
+  // useCharacters() busca uma vez na montagem do App, que acontece antes da sessão de
+  // login terminar de resolver — nesse instante a busca roda sem autenticação (RLS não
+  // retorna nada) e nunca mais é refeita. Refaz a busca assim que o usuário for confirmado,
+  // pra não travar contas com personagem verificado no gate de onboarding indevidamente.
+  useEffect(() => {
+    if (user) refresh()
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [user])
 
   if (loading) return null
 
