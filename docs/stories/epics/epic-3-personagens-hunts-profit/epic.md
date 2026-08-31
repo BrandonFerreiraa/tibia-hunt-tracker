@@ -71,6 +71,14 @@ Separar claramente "cadastrar personagem" de "registrar hunt", introduzir person
   - Given usuário clica/seleciona um dia específico, When o dia tem hunts registradas, Then vê o profit total daquele dia e a lista das hunts que contribuíram para ele.
   - Given um dia sem nenhuma hunt registrada, When selecionado, Then exibe profit `0` sem erro.
 
+### Story 3.6 — Excluir Hunt Registrada
+- **Descrição:** Hoje não existe nenhuma forma de excluir uma hunt já registrada (nem em `SessionList.jsx`, nem em `HuntDetailModal.jsx`) — o RLS de `sessions` já permite `delete` pelo dono (`for all`, herdado de `characters.user_id`), só falta a funcionalidade na UI. Adicionar um botão "Excluir" direto no card da hunt (`SessionList.jsx`, ao lado do botão existente de compartilhar/tornar privada), com confirmação (`window.confirm`, mesmo padrão já usado em `Settings.jsx#handleRemoveCharacter` pra remover personagem) antes de excluir. `session_monsters`/`session_items` têm `on delete cascade` pra `sessions` (`schema.sql`), então excluir a sessão já limpa os registros relacionados automaticamente, sem código extra. **Decisão de escopo (confirmada com o usuário):** sem usuário admin — cada dono só exclui as próprias hunts, mesmo modelo de permissão já usado em todo o resto do app (RLS por `user_id`).
+- **Executor:** `@dev` · **Quality Gate:** `@architect`
+- **AC:**
+  - Given uma hunt registrada, When o usuário clica em "Excluir" no card e confirma, Then a hunt some da lista e é removida do banco (incluindo `session_monsters`/`session_items` relacionados, via cascade).
+  - Given o usuário clica em "Excluir" mas cancela a confirmação, When a caixa de confirmação é fechada sem confirmar, Then nada é excluído e a hunt continua na lista.
+  - Given a hunt excluída estava compartilhada (`is_shared = true`), When removida, Then também some da tela "Hunts Compartilhadas" (consequência natural do `delete`, sem lógica extra — a view pública já depende da linha existir em `sessions`).
+
 ## Compatibility Requirements
 
 - [ ] Personagens já cadastrados continuam funcionando normalmente após a migration de `type` (default `'principal'` para registros existentes).
@@ -90,8 +98,13 @@ Separar claramente "cadastrar personagem" de "registrar hunt", introduzir person
 - [x] Nenhum cadastro/remoção de personagem fora de Configurações
 - [x] Duração em `H:MM` validada com pelo menos um caso de teste (159 min → 2:39)
 - [x] Troca de senha testada ponta-a-ponta com uma conta real (validado manualmente pelo usuário na Story 3.2, incluindo tradução do erro "mesma senha")
+- [x] Usuário consegue excluir uma hunt registrada direto do card, com confirmação — Story 3.6
 
-## Status: Done (2026-08-27)
+## Status: Done (reaberto e refechado em 2026-08-31)
+
+Stories 3.1-3.5 completas desde 2026-08-27 (ver histórico abaixo). **Story 3.6 (Excluir Hunt Registrada) adicionada e concluída em 2026-08-31**, a partir de feedback do usuário — hoje não existia forma de excluir uma hunt já registrada. Decisão de escopo confirmada com o usuário: exclusão só pelo próprio dono (mesmo modelo de RLS já usado em todo o app), sem usuário admin. QA Gate: PASS, sem findings.
+
+### Histórico (fechamento original, 2026-08-27)
 
 Todas as stories completas: 3.1 (Configurações — cadastro Principal/Maker), 3.1.1 (fast-follow: regra de Principal único, criada a partir de feedback do usuário em teste manual), 3.2 (troca de senha), 3.3 (Hunts simplificada + duração H:MM), 3.4 (Hunts Compartilhadas + badge de autoria, preservando a decisão de privacidade da Story 2.3), 3.5 (Meu Profit — diário/semanal/mensal).
 

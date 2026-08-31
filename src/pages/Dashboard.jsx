@@ -8,7 +8,7 @@ import { useSessions } from '../hooks/useSessions'
 function Dashboard() {
   const { characters, activeCharacterId, selectCharacter, loading: loadingCharacters } = useCharacters()
 
-  const { sessions, loading: loadingSessions, addSession, toggleShare } = useSessions(activeCharacterId)
+  const { sessions, loading: loadingSessions, addSession, toggleShare, removeSession } = useSessions(activeCharacterId)
 
   return (
     <div className="flex flex-col gap-8">
@@ -45,7 +45,7 @@ function Dashboard() {
             {loadingSessions ? (
               <p className="text-sm text-text-muted">Carregando sessões...</p>
             ) : (
-              <SessionList sessions={sessions} onToggleShare={toggleShare} />
+              <SessionList sessions={sessions} onToggleShare={toggleShare} onRemove={removeSession} />
             )}
           </>
         )}

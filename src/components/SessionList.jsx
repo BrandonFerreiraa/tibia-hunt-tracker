@@ -21,7 +21,7 @@ function toHunt(session) {
   }
 }
 
-function SessionList({ sessions, onToggleShare }) {
+function SessionList({ sessions, onToggleShare, onRemove }) {
   const [selectedSessionId, setSelectedSessionId] = useState(null)
 
   if (sessions.length === 0) {
@@ -39,21 +39,39 @@ function SessionList({ sessions, onToggleShare }) {
             hunt={toHunt(session)}
             onClick={() => setSelectedSessionId(session.id)}
             footer={
-              onToggleShare && (
-                <button
-                  type="button"
-                  onClick={(e) => {
-                    e.stopPropagation()
-                    onToggleShare(session.id, !session.is_shared)
-                  }}
-                  className="cursor-pointer"
-                >
-                  <Badge variant={session.is_shared ? 'success' : 'neutral'}>
-                    {session.is_shared
-                      ? '🌐 Compartilhada — clique p/ tornar privada'
-                      : '🔒 Privada — clique p/ compartilhar'}
-                  </Badge>
-                </button>
+              (onToggleShare || onRemove) && (
+                <div className="flex items-center justify-between gap-2">
+                  {onToggleShare && (
+                    <button
+                      type="button"
+                      onClick={(e) => {
+                        e.stopPropagation()
+                        onToggleShare(session.id, !session.is_shared)
+                      }}
+                      className="cursor-pointer"
+                    >
+                      <Badge variant={session.is_shared ? 'success' : 'neutral'}>
+                        {session.is_shared
+                          ? '🌐 Compartilhada — clique p/ tornar privada'
+                          : '🔒 Privada — clique p/ compartilhar'}
+                      </Badge>
+                    </button>
+                  )}
+                  {onRemove && (
+                    <button
+                      type="button"
+                      onClick={(e) => {
+                        e.stopPropagation()
+                        if (window.confirm(`Excluir a hunt "${session.hunt_name}"? Essa ação não pode ser desfeita.`)) {
+                          onRemove(session.id)
+                        }
+                      }}
+                      className="cursor-pointer text-xs text-danger hover:underline"
+                    >
+                      Excluir
+                    </button>
+                  )}
+                </div>
               )
             }
           />

@@ -78,5 +78,13 @@ export function useSessions(characterId) {
     return { error }
   }
 
-  return { sessions, loading, addSession, toggleShare }
+  async function removeSession(sessionId) {
+    const { error } = await supabase.from('sessions').delete().eq('id', sessionId)
+    if (!error) {
+      setSessions((prev) => prev.filter((s) => s.id !== sessionId))
+    }
+    return { error }
+  }
+
+  return { sessions, loading, addSession, toggleShare, removeSession }
 }
