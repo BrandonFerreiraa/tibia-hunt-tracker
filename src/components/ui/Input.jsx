@@ -1,4 +1,4 @@
-const baseClass =
+export const baseClass =
   'w-full rounded-lg border border-border bg-bg px-3 py-2 text-sm text-text placeholder:text-text-subtle outline-none transition-colors focus:border-accent focus:ring-1 focus:ring-accent disabled:opacity-50'
 
 export function Input({ className = '', ...props }) {

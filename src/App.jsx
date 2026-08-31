@@ -7,6 +7,7 @@ import Onboarding from './pages/Onboarding'
 import Dashboard from './pages/Dashboard'
 import HuntsFeed from './pages/HuntsFeed'
 import Profit from './pages/Profit'
+import Goals from './pages/Goals'
 import Settings from './pages/Settings'
 import Button from './components/ui/Button'
 
@@ -76,6 +77,15 @@ function App() {
               </button>
               <button
                 type="button"
+                onClick={() => setView('metas')}
+                className={`rounded-lg px-3 py-1.5 text-sm font-medium transition-colors cursor-pointer ${
+                  view === 'metas' ? 'bg-accent/10 text-accent' : 'text-text-muted hover:text-text'
+                }`}
+              >
+                Metas
+              </button>
+              <button
+                type="button"
                 onClick={() => setView('settings')}
                 className={`rounded-lg px-3 py-1.5 text-sm font-medium transition-colors cursor-pointer ${
                   view === 'settings' ? 'bg-accent/10 text-accent' : 'text-text-muted hover:text-text'
@@ -96,6 +106,7 @@ function App() {
         {view === 'dashboard' && <Dashboard />}
         {view === 'feed' && <HuntsFeed />}
         {view === 'profit' && <Profit />}
+        {view === 'metas' && <Goals />}
         {view === 'settings' && <Settings theme={theme} setTheme={setTheme} />}
       </main>
     </div>
