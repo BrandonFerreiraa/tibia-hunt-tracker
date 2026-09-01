@@ -9,22 +9,39 @@ import { Input, Label, Select } from '../components/ui/Input'
 
 const KNIGHT_CATEGORIES = ['swordfighting', 'axefighting', 'clubfighting']
 
-function Onboarding({ addCharacter, refresh }) {
+function Onboarding({ addCharacter, refresh, existingCharacter }) {
   const { busy, generateVerificationCode, checkVerification } = useCharacterVerification()
   const { syncProfile, syncSkill } = useCharacterStats()
-  const [step, setStep] = useState('name') // 'name' | 'knight-category' | 'verify'
+  const [step, setStep] = useState(existingCharacter ? 'verify' : 'name') // 'name' | 'knight-category' | 'verify'
   const [name, setName] = useState('')
   const [pendingInfo, setPendingInfo] = useState(null)
   const [knightCategory, setKnightCategory] = useState(KNIGHT_CATEGORIES[0])
   const [skillCategory, setSkillCategory] = useState(null)
-  const [character, setCharacter] = useState(null)
-  const [code, setCode] = useState(null)
+  const [character, setCharacter] = useState(existingCharacter)
+  const [code, setCode] = useState(existingCharacter?.verification_code ?? null)
   const [error, setError] = useState(null)
   const [submitting, setSubmitting] = useState(false)
 
-  // Se o nome do personagem já foi informado na tela de cadastro de conta (Login),
-  // continua o fluxo automaticamente em vez de pedir de novo.
+  // Se já existe um personagem cadastrado mas não verificado (ex.: recarregou a página no
+  // meio do onboarding), retoma direto no passo de verificar em vez de tentar cadastrar de
+  // novo — reaproveita o código ainda válido, ou gera um novo se estiver expirado/ausente.
   useEffect(() => {
+    if (existingCharacter) {
+      const codeStillValid =
+        existingCharacter.verification_code &&
+        existingCharacter.verification_code_expires_at &&
+        new Date(existingCharacter.verification_code_expires_at) > new Date()
+
+      if (!codeStillValid) {
+        generateVerificationCode(existingCharacter.id).then((result) => {
+          if (!result.error) setCode(result.code)
+        })
+      }
+      return
+    }
+
+    // Se o nome do personagem já foi informado na tela de cadastro de conta (Login),
+    // continua o fluxo automaticamente em vez de pedir de novo.
     const pending = localStorage.getItem('pendingCharacterName')
     if (pending) {
       localStorage.removeItem('pendingCharacterName')

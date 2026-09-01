@@ -33,7 +33,11 @@ function App() {
   if (loadingCharacters) return null
 
   if (!characters.some((c) => c.verified)) {
-    return <Onboarding addCharacter={addCharacter} refresh={refresh} />
+    // Se já existe um personagem cadastrado (mas não verificado — ex.: recarregou a página
+    // no meio do onboarding), retoma a partir dele em vez de tentar cadastrar de novo, o que
+    // batia no nome já existente (constraint characters_name_unique_ci).
+    const existingCharacter = characters.find((c) => !c.verified) ?? null
+    return <Onboarding addCharacter={addCharacter} refresh={refresh} existingCharacter={existingCharacter} />
   }
 
   return (
