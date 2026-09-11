@@ -85,3 +85,55 @@ export async function fetchHighscorePage(world, category, vocation, page) {
   const data = await response.json()
   return data?.highscores?.highscore_list ?? []
 }
+
+export async function fetchBoostedBoss() {
+  let response
+  try {
+    response = await fetch(`${BASE_URL}/boostablebosses`)
+  } catch {
+    throw new TibiaDataUnavailableError('network error')
+  }
+
+  if (response.status >= 500) {
+    throw new TibiaDataUnavailableError(response.status)
+  }
+
+  if (!response.ok) {
+    throw new TibiaDataUnavailableError(response.status)
+  }
+
+  const data = await response.json()
+  const boosted = data?.boostable_bosses?.boosted
+
+  if (!boosted) {
+    throw new TibiaDataUnavailableError('unexpected response')
+  }
+
+  return { name: boosted.name, imageUrl: boosted.image_url }
+}
+
+export async function fetchBoostedCreature() {
+  let response
+  try {
+    response = await fetch(`${BASE_URL}/creatures`)
+  } catch {
+    throw new TibiaDataUnavailableError('network error')
+  }
+
+  if (response.status >= 500) {
+    throw new TibiaDataUnavailableError(response.status)
+  }
+
+  if (!response.ok) {
+    throw new TibiaDataUnavailableError(response.status)
+  }
+
+  const data = await response.json()
+  const boosted = data?.creatures?.boosted
+
+  if (!boosted) {
+    throw new TibiaDataUnavailableError('unexpected response')
+  }
+
+  return { name: boosted.name, imageUrl: boosted.image_url }
+}

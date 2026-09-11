@@ -4,6 +4,7 @@ import { useCharacters } from './hooks/useCharacters'
 import { useTheme } from './hooks/useTheme'
 import Login from './pages/Login'
 import Onboarding from './pages/Onboarding'
+import Home from './pages/Home'
 import Dashboard from './pages/Dashboard'
 import HuntsFeed from './pages/HuntsFeed'
 import Profit from './pages/Profit'
@@ -15,7 +16,7 @@ function App() {
   const { user, loading, signOut } = useAuth()
   const { characters, loading: loadingCharacters, addCharacter, refresh } = useCharacters()
   const { theme, setTheme } = useTheme()
-  const [view, setView] = useState('dashboard')
+  const [view, setView] = useState('home')
 
   // useCharacters() busca uma vez na montagem do App, que acontece antes da sessão de
   // login terminar de resolver — nesse instante a busca roda sem autenticação (RLS não
@@ -50,6 +51,15 @@ function App() {
             </h1>
 
             <nav className="flex items-center gap-1">
+              <button
+                type="button"
+                onClick={() => setView('home')}
+                className={`rounded-lg px-3 py-1.5 text-sm font-medium transition-colors cursor-pointer ${
+                  view === 'home' ? 'bg-accent/10 text-accent' : 'text-text-muted hover:text-text'
+                }`}
+              >
+                Início
+              </button>
               <button
                 type="button"
                 onClick={() => setView('dashboard')}
@@ -107,6 +117,7 @@ function App() {
       </header>
 
       <main className="mx-auto max-w-5xl px-4 py-8 sm:px-6">
+        {view === 'home' && <Home onNavigate={setView} />}
         {view === 'dashboard' && <Dashboard />}
         {view === 'feed' && <HuntsFeed />}
         {view === 'profit' && <Profit />}
