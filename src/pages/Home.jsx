@@ -61,8 +61,8 @@ function Home({ onNavigate }) {
         <h2 className="mb-3 text-lg font-semibold text-text">Ir para</h2>
         <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-3">
           {NAV_CARDS.map((card) => (
-            <button key={card.view} type="button" onClick={() => onNavigate(card.view)} className="text-left">
-              <Card className="flex cursor-pointer items-start gap-3 transition-colors hover:border-accent/50">
+            <button key={card.view} type="button" onClick={() => onNavigate(card.view)} className="flex h-full text-left">
+              <Card className="flex h-full w-full cursor-pointer items-start gap-3 transition-colors hover:border-accent/50">
                 <span className="text-2xl leading-none" aria-hidden="true">
                   {card.icon}
                 </span>
