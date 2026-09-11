@@ -13,3 +13,8 @@ const RASHID_CITY_BY_WEEKDAY = [
 export function getRashidCityToday(date = new Date()) {
   return RASHID_CITY_BY_WEEKDAY[date.getDay()]
 }
+
+// Sem imagem oficial do Rashid via TibiaData (não há endpoint de NPC) — usa a
+// mesma imagem 64x64 da TibiaWiki (Fandom) já confirmada carregando corretamente.
+export const RASHID_IMAGE_URL =
+  'https://static.wikia.nocookie.net/tibia/images/f/f5/Rashid.gif/revision/latest?cb=20221218120126&path-prefix=en&format=original'
